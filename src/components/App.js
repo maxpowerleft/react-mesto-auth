@@ -1,4 +1,5 @@
 import React from 'react';
+import { Route, Switch, Redirect } from 'react-router-dom';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
@@ -18,6 +19,7 @@ function App() {
   const [isAddPlacePopupOpen, setAddPlacePopupOpen] = React.useState(false);
   const [selectedCard, setSelectedCard] = React.useState({ link: '', name: '' });
   const [cards, setCards] = React.useState([]);
+  const [loggedIn, setLoggedIn] = React.useState(false);
 
   React.useEffect(() => {
     api.getInitialCards()
@@ -120,19 +122,30 @@ function handleCardLike(card) {
     <CurrentUserContext.Provider value={currentUser}>
       <div className="page">
         <Header />
-        <Main
-          onCardClick={handleCardClick}
-          onEditAvatar={handleEditAvatarClick}
-          onEditProfile={handleEditProfileClick}
-          onAddPlace={handleAddPlaceClick}
-          onCardDelete={handleCardDelete}
-          onCardLike={handleCardLike}
-          cards={cards} />
-        <Footer />
-        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
-        <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
-        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
-        <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <Switch>
+          <Route exact path="/">
+            {loggedIn ? <Redirect to="/sign-in" /> : <Redirect to="/sign-in" />}
+          </Route> 
+          <Route exact path="/sign-up">
+            {/* <Register /> */}
+          </Route>
+          <Route exact path="/sign-in">
+            {/* <Register /> */}
+          </Route>
+          <Main
+            onCardClick={handleCardClick}
+            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onCardDelete={handleCardDelete}
+            onCardLike={handleCardLike}
+            cards={cards} />
+          <Footer />
+          <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
+          <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
+          <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
+          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        </Switch>
       </div>
     </CurrentUserContext.Provider>
   );
