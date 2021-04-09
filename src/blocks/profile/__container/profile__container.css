@@ -1,0 +1,18 @@
+.profile__container {
+  margin-right: 30px;
+  position: relative;
+  border-radius: 50%;
+}
+
+.profile__container:hover .profile__avatar {
+  cursor: pointer;
+  opacity: .4;
+}
+
+@media screen and (max-width: 639px) {
+  .profile__container {
+    max-width: 100px;
+    width: 100%;
+    margin: auto;
+  }
+}
