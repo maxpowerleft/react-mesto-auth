@@ -1,10 +1,11 @@
 @import url(./__logo/header__logo.css);
+@import url(./__auth-link/header__auth-link.css);
 
 .header {
   max-width: 882px;
   min-height: 73px;
   display: flex;
-  justify-content: flex-start;
+  justify-content: space-between;
   align-items: flex-start;
   padding-top: 45px;
   margin: 0 auto 0;
