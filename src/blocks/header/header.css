@@ -1,5 +1,8 @@
 @import url(./__logo/header__logo.css);
 @import url(./__auth-link/header__auth-link.css);
+@import url(./__auth-link/_logout/header__auth-link_logout.css);
+@import url(./__list/header__list.css);
+@import url(./__text/header__text.css);
 
 .header {
   max-width: 882px;
@@ -41,3 +44,8 @@
     padding-top: 28px;
   }
 }
+
+
+
+
+

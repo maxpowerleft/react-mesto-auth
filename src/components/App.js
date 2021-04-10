@@ -12,7 +12,8 @@ import AddPlacePopup from './AddPlacePopup.js';
 import api from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
 import * as apiAuth from '../utils/apiAuth.js';
-import ProtectedRoute from './ProtectedRoute.js'
+import ProtectedRoute from './ProtectedRoute.js';
+import InfoTooltip from './InfoTooltip.js';
 
 
 function App() {
@@ -25,16 +26,24 @@ function App() {
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
   const history = useHistory();
-  // const [userData, setUserData] = React.useState({
-  //   email: '',
-  //   password: ''
-  // })
+  const [tooltipStatus, setTooltipStatus] = React.useState('');
+  const [isInfoToolTipOpen, setIsInfoToolTipOpen] = React.useState(false);
+  const [userEmail, setUserEmail] = React.useState('');
 
   React.useEffect(() => {
-    if (loggedIn) {
-      history.push("/");
-    }
-  }, [history, loggedIn])
+    let jwt = localStorage.getItem('jwt');
+      if (jwt) {
+        apiAuth.getContent(jwt)
+        .then((res) => {
+          setLoggedIn(true)
+          setUserEmail(res.data.email)
+          history.push('/');
+        })
+        .catch(err => {
+        console.error(err)
+      });
+      }
+  }, [history])
 
   React.useEffect(() => {
     api.getInitialCards()
@@ -52,35 +61,38 @@ function App() {
         if (!data) throw new Error('Неверные имя пользователя или пароль')
         if (data.token) {
           setLoggedIn(true)
-          localStorage.setItem('jwt', data.jwt)
+          localStorage.setItem('jwt', data.token)
           history.push('/')
           return;
         }
       })
+    .catch((err) => {
+          console.error(err)
+          setTooltipStatus('fail')
+        });
   }
 
     const handleRegister = ({ email, password }) => {
       return apiAuth.register(email, password)
         .then((res) => {
-          if (!res || res.statusCode === 400) throw new Error('Что-то пошло не так');
-          history.push('/sign-in')
-          return res;
+          if (res.data._id) {
+            setTooltipStatus('success');
+            setIsInfoToolTipOpen(true);
+            history.push('/sign-in');
+          }
         })
-        .catch()
+        .catch((err) => {
+          console.error(err);
+          setTooltipStatus('fail');
+          setIsInfoToolTipOpen(true);
+        });
   }
 
-  // const tokenCheck = () => {
-  //   if (localStorage.getItem('jwt')) {
-  //     let jwt = localStorage.getItem('jwt');
-  //     apiAuth.getContent(jwt)
-  //       .then(({ email, password }) => {
-  //         if ({ email, password }) {
-  //           setLoggedIn(true)
-  //           setUserData({ email, password })
-  //       }
-  //     });
-  //   }
-  // }
+  const handleLogout = () => {
+    setLoggedIn(true);
+    localStorage.removeItem('jwt');
+    history.push('/sign-in');
+  }
 
 function handleCardLike(card) {
     const isLiked = card.likes.some(item => item._id === currentUser._id);
@@ -156,7 +168,9 @@ function handleCardLike(card) {
     setEditAvatarPopupOpen(false);
     setEditProfilePopupOpen(false);
     setAddPlacePopupOpen(false);
-    setSelectedCard({ link: '', name: '' })
+    setSelectedCard({ link: '', name: '' });
+    setTooltipStatus('');
+    setIsInfoToolTipOpen(false);
   }
 
   React.useEffect(() => {
@@ -171,8 +185,8 @@ function handleCardLike(card) {
 
   return (
     <CurrentUserContext.Provider value={currentUser}>
-      <div className="page">
-        <Header />
+      <div className="page__container">
+        <Header userEmail={userEmail} handleLogout={handleLogout} />
         <Switch>
           <ProtectedRoute
             exact
@@ -187,26 +201,19 @@ function handleCardLike(card) {
             onCardLike={handleCardLike}
             cards={cards} />
 
-          <Route exact path="/sign-up">
+          <Route path="/sign-up">
             <Register onRegister={handleRegister} />
           </Route>
-          <Route exact path="/sign-in">
+          <Route path="/sign-in">
             <Login onLogin={handleLogin} />
           </Route>
-          {/* <Main
-            onCardClick={handleCardClick}
-            onEditAvatar={handleEditAvatarClick}
-            onEditProfile={handleEditProfileClick}
-            onAddPlace={handleAddPlaceClick}
-            onCardDelete={handleCardDelete}
-            onCardLike={handleCardLike}
-            cards={cards} /> */}
           <Footer />
-          <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
-          <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
-          <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
-          <ImagePopup card={selectedCard} onClose={closeAllPopups} />
         </Switch>
+        <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
+        <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
+        <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
+        <ImagePopup card={selectedCard} onClose={closeAllPopups} />
+        <InfoTooltip authStatus={tooltipStatus} onClose={closeAllPopups} isOpen={isInfoToolTipOpen} />
       </div>
     </CurrentUserContext.Provider>
   );

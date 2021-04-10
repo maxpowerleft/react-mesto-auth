@@ -7,8 +7,6 @@ function Login({ onLogin}) {
     password: ''
   })
 
-  const [message, setMessage] = React.useState('');
-
   function handleChange(e) {
     const { name, value } = e.target;
     setUserData({
@@ -20,7 +18,9 @@ function Login({ onLogin}) {
   function handleSubmit(e) {
     e.preventDefault();
     onLogin(userData)
-    .catch(err => setMessage(err.message || 'Что-то пошло не так'));
+      .catch(err => {
+        console.error(err)
+      })
   }
 
   return (
@@ -45,7 +45,6 @@ function Login({ onLogin}) {
           type="password"
           onChange={handleChange}
           required />
-        <span className="auth__error">{message}</span>
         <button className="auth__btn" type="submit">Войти</button>
       </form>
     </section>

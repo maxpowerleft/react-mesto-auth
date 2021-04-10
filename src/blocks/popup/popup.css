@@ -11,6 +11,8 @@
 @import url(./__fullscreen-container/popup__fullscreen-container.css);
 @import url(./__fullscreen-image/popup__fullscreen-image.css);
 @import url(./__fullscreen-text/popup__fullscreen-text.css);
+@import url(./__container-auth-state/popup__container-auth-state.css);
+@import url(./__status-img/popup__status-img.css);
 
 .popup {
   font-family: 'Inter', Arial, Helvetica, sans-serif;
