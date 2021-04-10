@@ -1,5 +1,5 @@
 import React from 'react';
-import { Route, Switch, Redirect } from 'react-router-dom';
+import { Route, Switch, useHistory } from 'react-router-dom';
 import Login from './Login.js';
 import Register from './Register.js';
 import Header from './Header.js';
@@ -11,6 +11,8 @@ import EditAvatarPopup from './EditAvatarPopup.js';
 import AddPlacePopup from './AddPlacePopup.js';
 import api from '../utils/api';
 import { CurrentUserContext } from '../contexts/CurrentUserContext.js';
+import * as apiAuth from '../utils/apiAuth.js';
+import ProtectedRoute from './ProtectedRoute.js'
 
 
 function App() {
@@ -22,6 +24,17 @@ function App() {
   const [selectedCard, setSelectedCard] = React.useState({ link: '', name: '' });
   const [cards, setCards] = React.useState([]);
   const [loggedIn, setLoggedIn] = React.useState(false);
+  const history = useHistory();
+  // const [userData, setUserData] = React.useState({
+  //   email: '',
+  //   password: ''
+  // })
+
+  React.useEffect(() => {
+    if (loggedIn) {
+      history.push("/");
+    }
+  }, [history, loggedIn])
 
   React.useEffect(() => {
     api.getInitialCards()
@@ -32,6 +45,42 @@ function App() {
         console.error(err)
       })
   }, []);
+
+  const handleLogin = ({ email, password }) => {
+    return apiAuth.authorise(email, password)
+      .then((data) => {
+        if (!data) throw new Error('Неверные имя пользователя или пароль')
+        if (data.token) {
+          setLoggedIn(true)
+          localStorage.setItem('jwt', data.jwt)
+          history.push('/')
+          return;
+        }
+      })
+  }
+
+    const handleRegister = ({ email, password }) => {
+      return apiAuth.register(email, password)
+        .then((res) => {
+          if (!res || res.statusCode === 400) throw new Error('Что-то пошло не так');
+          history.push('/sign-in')
+          return res;
+        })
+        .catch()
+  }
+
+  // const tokenCheck = () => {
+  //   if (localStorage.getItem('jwt')) {
+  //     let jwt = localStorage.getItem('jwt');
+  //     apiAuth.getContent(jwt)
+  //       .then(({ email, password }) => {
+  //         if ({ email, password }) {
+  //           setLoggedIn(true)
+  //           setUserData({ email, password })
+  //       }
+  //     });
+  //   }
+  // }
 
 function handleCardLike(card) {
     const isLiked = card.likes.some(item => item._id === currentUser._id);
@@ -125,16 +174,11 @@ function handleCardLike(card) {
       <div className="page">
         <Header />
         <Switch>
-          <Route exact path="/">
-            {loggedIn ? <Redirect to="/sign-in" /> : <Redirect to="/sign-up" />}
-          </Route> 
-          <Route exact path="/sign-up">
-            <Register />
-          </Route>
-          <Route exact path="/sign-in">
-            <Login />
-          </Route>
-          <Main
+          <ProtectedRoute
+            exact
+            path="/"
+            loggedIn={loggedIn}
+            component={Main}
             onCardClick={handleCardClick}
             onEditAvatar={handleEditAvatarClick}
             onEditProfile={handleEditProfileClick}
@@ -142,6 +186,21 @@ function handleCardLike(card) {
             onCardDelete={handleCardDelete}
             onCardLike={handleCardLike}
             cards={cards} />
+
+          <Route exact path="/sign-up">
+            <Register onRegister={handleRegister} />
+          </Route>
+          <Route exact path="/sign-in">
+            <Login onLogin={handleLogin} />
+          </Route>
+          {/* <Main
+            onCardClick={handleCardClick}
+            onEditAvatar={handleEditAvatarClick}
+            onEditProfile={handleEditProfileClick}
+            onAddPlace={handleAddPlaceClick}
+            onCardDelete={handleCardDelete}
+            onCardLike={handleCardLike}
+            cards={cards} /> */}
           <Footer />
           <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
           <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
