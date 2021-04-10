@@ -1,0 +1,5 @@
+.popup__close_fullscreen {
+  position: absolute;
+  left: 100%;
+  bottom: 99%;
+}
