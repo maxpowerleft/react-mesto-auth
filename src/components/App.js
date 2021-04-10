@@ -1,5 +1,7 @@
 import React from 'react';
 import { Route, Switch, Redirect } from 'react-router-dom';
+import Login from './Login.js';
+import Register from './Register.js';
 import Header from './Header.js';
 import Main from './Main.js';
 import Footer from './Footer.js';
@@ -124,13 +126,13 @@ function handleCardLike(card) {
         <Header />
         <Switch>
           <Route exact path="/">
-            {loggedIn ? <Redirect to="/sign-in" /> : <Redirect to="/sign-in" />}
+            {loggedIn ? <Redirect to="/sign-in" /> : <Redirect to="/sign-up" />}
           </Route> 
           <Route exact path="/sign-up">
-            {/* <Register /> */}
+            <Register />
           </Route>
           <Route exact path="/sign-in">
-            {/* <Register /> */}
+            <Login />
           </Route>
           <Main
             onCardClick={handleCardClick}

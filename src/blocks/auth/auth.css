@@ -1,0 +1,30 @@
+@import url(./__btn/auth__btn.css);
+@import url(./__form/auth__form.css);
+@import url(./__input/auth____input.css);
+@import url(./__title/auth__title.css);
+
+.auth {
+  max-width: 358px;
+  width: 100%;
+  margin: 60px auto;
+}
+
+.auth__link {
+  display: flex;
+  justify-content: center;
+  font-weight: 400;
+  font-style: normal;
+  font-size: 17px;
+  line-height: 1.2;
+  color: #fff;
+  text-decoration: none;
+}
+
+
+
+
+
+
+
+
+
