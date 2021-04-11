@@ -31,7 +31,7 @@ function App() {
   const [userEmail, setUserEmail] = React.useState('');
 
   React.useEffect(() => {
-    let jwt = localStorage.getItem('jwt');
+    const jwt = localStorage.getItem('jwt');
       if (jwt) {
         apiAuth.getContent(jwt)
         .then((res) => {
@@ -60,6 +60,7 @@ function App() {
       .then((data) => {
         if (!data) throw new Error('Неверные имя пользователя или пароль')
         if (data.token) {
+          setUserEmail(email)
           setLoggedIn(true)
           localStorage.setItem('jwt', data.token)
           history.push('/')
@@ -207,8 +208,8 @@ function handleCardLike(card) {
           <Route path="/sign-in">
             <Login onLogin={handleLogin} />
           </Route>
-          <Footer />
         </Switch>
+        <Footer />
         <EditProfilePopup isOpen={isEditProfilePopupOpen} onClose={closeAllPopups} onUpdateUser={handleUpdateUser} />
         <AddPlacePopup isOpen={isAddPlacePopupOpen} onClose={closeAllPopups} onAddPlace={handleAddPlaceSubmit} />
         <EditAvatarPopup isOpen={isEditAvatarPopupOpen} onClose={closeAllPopups} onUpdateAvatar={handleUpdateAvatar} />
